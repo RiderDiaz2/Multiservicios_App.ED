@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Reporte Técnico - Multiservicios Eduin Díaz</title>
+  
+  <!-- Configuración PWA -->
+  <meta name="theme-color" content="#0369a1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Eduin Díaz App">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./src/assets/img/Multiservicios-EduinDiaz.png" type="image/x-icon">
+  <link rel="apple-touch-icon" href="./src/assets/img/Multiservicios-EduinDiaz.png">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Librerías jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --border-focus: #0284c7;
+      --radius: 20px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      padding: 16px 12px;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 0 0 24px 0;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 40px -15px rgba(2, 132, 199, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      overflow: hidden;
+    }
+
+    /* HEADER BANNER PREMIUM Y MODERNO */
+    .header-banner {
+      background: var(--primary-gradient);
+      padding: 24px 20px;
+      color: #ffffff;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+    }
+
+    .header-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-frame {
+      width: 68px;
+      height: 68px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 6px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .logo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .header-title-box h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+
+    .header-title-box p {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: #e0f2fe;
+      font-weight: 500;
+      opacity: 0.95;
+    }
+
+    /* CONTENIDO DEL FORMULARIO */
+    form {
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-top: 22px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      background-color: var(--primary);
+      border-radius: 3px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      color: #334155;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    /* DESPLEGABLES MÚLTIPLES */
+    .custom-multiselect {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-box {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .select-box::after {
+      content: '▼';
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .checkboxes-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: #ffffff;
+      border: 1.5px solid var(--border-focus);
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      z-index: 20;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 6px;
+      margin-top: 4px;
+    }
+
+    .checkboxes-dropdown label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      margin: 0;
+      font-size: 13px;
+      font-weight: normal;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .checkboxes-dropdown label:hover {
+      background-color: #f1f5f9;
+    }
+
+    .checkboxes-dropdown input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* BOTÓN ACCIÓN PRINCIPAL */
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.28);
+    }
+
+    .btn:hover {
+      box-shadow: 0 8px 22px rgba(16, 185, 129, 0.38);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+  </style>
+</head>
+<body>
+
+<div class="card" id="reporte">
+  <!-- BANNER ELEGANTE TIPO APP -->
+  <div class="header-banner">
+    <div class="header-status-badge">
+      <span class="status-dot"></span>
+      <span>Sistema Técnico Operativo</span>
+    </div>
+    <div class="header-content">
+      <div class="logo-frame">
+        <img src="./src/assets/img/Multiservicios-EduinDiaz.png" alt="Logo Eduin Díaz" id="logoImg" onerror="this.style.display='none'">
+      </div>
+      <div class="header-title-box">
+        <h2>MULTISERVICIOS EDUIN DÍAZ</h2>
+        <p>Refrigeración & Climatización Profesional</p>
+      </div>
+    </div>
+  </div>
+
+  <form id="diagForm">
+    <div class="section-title">1. Datos del Cliente</div>
+    <label for="cliente">Nombre del Cliente:</label>
+    <input type="text" id="cliente" placeholder="Ej. Juan Pérez" required>
+
+    <div class="row">
+      <div class="col">
+        <label for="telefono">Teléfono (WhatsApp):</label>
+        <input type="tel" id="telefono" placeholder="0412XXXXXXX" required>
+      </div>
+      <div class="col">
+        <label for="equipo">Equipo / Tipo:</label>
+        <select id="equipo" required>
+          <option value="">-- Seleccionar --</option>
+          <optgroup label="Aires Acondicionados">
+            <option value="Split 12.000 BTU">Split 12.000 BTU</option>
+            <option value="Split 18.000 BTU">Split 18.000 BTU</option>
+            <option value="Split 24.000 BTU">Split 24.000 BTU</option>
+            <option value="Split 36.000 BTU">Split 36.000 BTU</option>
+            <option value="Aire de Ventana 5.000 BTU">Aire de Vent 5.000 BTU</option>
+            <option value="Aire de Ventana 8.000 BTU">Aire de Vent 8.000 BTU</option>
+            <option value="Aire de Ventana 12.000 BTU">Aire de Vent 12.000 BTU</option>
+            <option value="Aire de Ventana 18.000 BTU">Aire de Vent 18.000 BTU</option>
+            <option value="Aire de Ventana 24.000 BTU">Aire de Vent 24.000 BTU</option>
+            <option value="Compacto / Piso-Techo">Compacto / Piso-Techo</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">2. Mediciones Técnicas</div>
+    <div class="row">
+      <div class="col">
+        <label for="voltaje">Voltaje (V):</label>
+        <select id="voltaje">
+          <option value="">-- Voltaje --</option>
+          <option value="110 V - 120 V (Monofásico)">110-V</option>
+          <option value="220 V - 240 V (Monofásico)">220-V</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="amperaje">Amperaje (A):</label>
+        <input type="text" id="amperaje" placeholder="Ej. 5.2 A">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="tipoGas">Tipo de Refrigerante:</label>
+        <select id="tipoGas">
+          <option value="">-- Refrigerante --</option>
+          <option value="R410A">R410A</option>
+          <option value="R22">R22</option>
+          <option value="R32">R32</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="presion">Presión (PSI):</label>
+        <input type="text" id="presion" placeholder="Ej. 120 PSI">
+      </div>
+    </div>
+
+    <!-- FILTROS MÚLTIPLES -->
+    <div class="row">
+      <div class="col">
+        <label>Capacitor:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('capDropdown')">
+            <span id="capSelectLabel">-- Seleccionar Capacitor --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="capDropdown">
+            <label><input type="checkbox" value="Óptimo" onchange="updateGenericLabel('capDropdown', 'capSelectLabel', '-- Seleccionar Capacitor --', 'seleccionados')"> Óptimo</label>
+            <label><input type="checkbox" value="Deficiente / Desvalorizado" onchange="updateGenericLabel('capDropdown', 'capSelectLabel', '-- Seleccionar Capacitor --', 'seleccionados')"> Deficiente / Desvalorizado</label>
+            <label><input type="checkbox" value="Dañado" onchange="updateGenericLabel('capDropdown', 'capSelectLabel', '-- Seleccionar Capacitor --', 'seleccionados')"> Dañado</label>
+            <label><input type="checkbox" value="Abierto / Sin continuidad" onchange="updateGenericLabel('capDropdown', 'capSelectLabel', '-- Seleccionar Capacitor --', 'seleccionados')"> Abierto / Sin continuidad</label>
+            <label><input type="checkbox" value="Hinchado / Abombado" onchange="updateGenericLabel('capDropdown', 'capSelectLabel', '-- Seleccionar Capacitor --', 'seleccionados')"> Hinchado / Abombado</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Sensores de Temperatura:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('sensorDropdown')">
+            <span id="sensorSelectLabel">-- Seleccionar Sensores --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="sensorDropdown">
+            <label><input type="checkbox" value="Óptimos / Lectura Correcta" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> Óptimos / Lectura Correcta</label>
+            <label><input type="checkbox" value="Descalibrados" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> Descalibrados</label>
+            <label><input type="checkbox" value="Sensor de Aire Dañado" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> Sensor de Aire Dañado</label>
+            <label><input type="checkbox" value="Sensor de Pozo / Serpentín Dañado" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> Sensor de Pozo / Serpentín Dañado</label>
+            <label><input type="checkbox" value="Abierto / Sin resistencia" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> Abierto / Sin resistencia</label>
+            <label><input type="checkbox" value="En Cortocircuito" onchange="updateGenericLabel('sensorDropdown', 'sensorSelectLabel', '-- Seleccionar Sensores --', 'seleccionados')"> En Cortocircuito</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Térmicos / Protector Térmico:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('termicoDropdown')">
+            <span id="termicoSelectLabel">-- Seleccionar Térmicos --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="termicoDropdown">
+            <label><input type="checkbox" value="Operativo / Sin Novedad" onchange="updateGenericLabel('termicoDropdown', 'termicoSelectLabel', '-- Seleccionar Térmicos --', 'seleccionados')"> Operativo / Sin Novedad</label>
+            <label><input type="checkbox" value="Disparado por Sobrecalentamiento" onchange="updateGenericLabel('termicoDropdown', 'termicoSelectLabel', '-- Seleccionar Térmicos --', 'seleccionados')"> Disparado por Sobrecalentamiento</label>
+            <label><input type="checkbox" value="Protector Térmico Dañado / Abierto" onchange="updateGenericLabel('termicoDropdown', 'termicoSelectLabel', '-- Seleccionar Térmicos --', 'seleccionados')"> Protector Térmico Dañado / Abierto</label>
+            <label><input type="checkbox" value="Falla por Sobrecarga de Amperaje" onchange="updateGenericLabel('termicoDropdown', 'termicoSelectLabel', '-- Seleccionar Térmicos --', 'seleccionados')"> Falla por Sobrecarga de Amperaje</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Estado de la Tarjeta Electrónica:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('tarjetaDropdown')">
+            <span id="tarjetaSelectLabel">-- Seleccionar Tarjeta --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="tarjetaDropdown">
+            <label><input type="checkbox" value="Óptima / Funcionando Correctamente" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Óptima / Funcionando Correctamente</label>
+            <label><input type="checkbox" value="Falla en Fuente de Alimentación" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Falla en Fuente de Alimentación</label>
+            <label><input type="checkbox" value="Relay / Relevador Dañado" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Relay / Relevador Dañado</label>
+            <label><input type="checkbox" value="Varistor o Fusible Quemado" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Varistor o Fusible Quemado</label>
+            <label><input type="checkbox" value="Pista Partida / Daño por Sulfatación" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Pista Partida / Daño por Sulfatación</label>
+            <label><input type="checkbox" value="Microcontrolador / Daño Irreversible" onchange="updateGenericLabel('tarjetaDropdown', 'tarjetaSelectLabel', '-- Seleccionar Tarjeta --', 'seleccionadas')"> Microcontrolador / Daño Irreversible</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Rodamientos Condensadora:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('rodCondDropdown')">
+            <span id="rodCondSelectLabel">-- Seleccionar Condensadora --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="rodCondDropdown">
+            <label><input type="checkbox" value="Silenciosos / Óptimos" onchange="updateGenericLabel('rodCondDropdown', 'rodCondSelectLabel', '-- Seleccionar Condensadora --', 'seleccionados')"> Silenciosos / Óptimos</label>
+            <label><input type="checkbox" value="Con Ruido / Zumbido Excesivo" onchange="updateGenericLabel('rodCondDropdown', 'rodCondSelectLabel', '-- Seleccionar Condensadora --', 'seleccionados')"> Con Ruido / Zumbido Excesivo</label>
+            <label><input type="checkbox" value="Atascados / Trancados" onchange="updateGenericLabel('rodCondDropdown', 'rodCondSelectLabel', '-- Seleccionar Condensadora --', 'seleccionados')"> Atascados / Trancados</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Rodamientos Evaporadora:</label>
+        <div class="custom-multiselect">
+          <div class="select-box" onclick="toggleDropdown('rodEvapDropdown')">
+            <span id="rodEvapSelectLabel">-- Seleccionar Evaporadora --</span>
+          </div>
+          <div class="checkboxes-dropdown" id="rodEvapDropdown">
+            <label><input type="checkbox" value="Silenciosos / Óptimos" onchange="updateGenericLabel('rodEvapDropdown', 'rodEvapSelectLabel', '-- Seleccionar Evaporadora --', 'seleccionados')"> Silenciosos / Óptimos</label>
+            <label><input type="checkbox" value="Con Ruido / Zumbido Excesivo" onchange="updateGenericLabel('rodEvapDropdown', 'rodEvapSelectLabel', '-- Seleccionar Evaporadora --', 'seleccionados')"> Con Ruido / Zumbido Excesivo</label>
+            <label><input type="checkbox" value="Atascados / Trancados" onchange="updateGenericLabel('rodEvapDropdown', 'rodEvapSelectLabel', '-- Seleccionar Evaporadora --', 'seleccionados')"> Atascados / Trancados</label>
+            <label><input type="checkbox" value="Bushing / Bocina Desgastada" onchange="updateGenericLabel('rodEvapDropdown', 'rodEvapSelectLabel', '-- Seleccionar Evaporadora --', 'seleccionados')"> Bushing / Bocina Desgastada</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">3. Diagnóstico y Recomendación</div>
+    <label for="diagnostico">Diagnóstico Técnico:</label>
+    <textarea id="diagnostico" rows="2" placeholder="Ej. Equipo presenta obstrucción por suciedad en serpentín..."></textarea>
+
+    <label>Recomendación / Servicio Requerido:</label>
+    <div class="custom-multiselect">
+      <div class="select-box" onclick="toggleDropdown('recomDropdown')">
+        <span id="recomSelectLabel">-- Seleccionar Recomendaciones --</span>
+      </div>
+      <div class="checkboxes-dropdown" id="recomDropdown">
+        <label><input type="checkbox" value="Mantenimiento Preventivo / Lavado Profundo" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Mantenimiento Preventivo / Lavado Profundo</label>
+        <label><input type="checkbox" value="Corrección de Fuga y Recarga de Gas" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Corrección de Fuga y Recarga de Gas</label>
+        <label><input type="checkbox" value="Sustitución de Filtro Deshidratador" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Sustitución de Filtro Deshidratador</label>
+        <label><input type="checkbox" value="Reemplazo de Elemento de Expansión" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Reemplazo de Elemento de Expansión</label>
+        <label><input type="checkbox" value="Cambio de Capacitor de Arranque/Marcha" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Cambio de Capacitor de Arranque/Marcha</label>
+        <label><input type="checkbox" value="Sustitución de Compresor" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Sustitución de Compresor</label>
+        <label><input type="checkbox" value="Reemplazo de Motor Ventilador" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Reemplazo de Motor Ventilador</label>
+        <label><input type="checkbox" value="Reparación de Tarjeta Electrónica" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Reparación de Tarjeta Electrónica</label>
+        <label><input type="checkbox" value="Sustitución de Contactor / Relé" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Sustitución de Contactor / Relé</label>
+        <label><input type="checkbox" value="Instalación de Protector de Voltaje" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Instalación de Protector de Voltaje</label>
+        <label><input type="checkbox" value="Adecuación de Aislamiento Térmico" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Adecuación de Aislamiento Térmico</label>
+        <label><input type="checkbox" value="Corrección de Conexiones Eléctricas" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Corrección de Conexiones Eléctricas</label>
+        <label><input type="checkbox" value="Equipo Operativo sin Novedad" onchange="updateGenericLabel('recomDropdown', 'recomSelectLabel', '-- Seleccionar Recomendaciones --', 'seleccionadas')"> Equipo Operativo sin Novedad</label>
+      </div>
+    </div>
+
+    <label for="monto">Cotización / Estimado ($):</label>
+    <input type="text" id="monto" placeholder="Ej. $50">
+
+    <button type="button" class="btn" onclick="generarPDFYEnviar()">
+      📄 Descargar Reporte PDF y Enviar por WhatsApp
+    </button>
+  </form>
+</div>
+
+<script>
+  function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    const isVisible = dropdown.style.display === 'block';
+    document.querySelectorAll('.checkboxes-dropdown').forEach(d => d.style.display = 'none');
+    if (!isVisible) {
+      dropdown.style.display = 'block';
+    }
+  }
+
+  function updateGenericLabel(dropdownId, labelId, defaultText, suffix) {
+    const selected = Array.from(document.querySelectorAll(`#${dropdownId} input:checked`)).map(cb => cb.value);
+    const label = document.getElementById(labelId);
+    if (selected.length === 0) {
+      label.innerText = defaultText;
+    } else if (selected.length === 1) {
+      label.innerText = selected[0];
+    } else {
+      label.innerText = `${selected.length} ${suffix}`;
+    }
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.closest('.custom-multiselect')) {
+      document.querySelectorAll('.checkboxes-dropdown').forEach(d => d.style.display = 'none');
+    }
+  };
+
+  function getSelectedValues(dropdownId) {
+    return Array.from(document.querySelectorAll(`#${dropdownId} input:checked`)).map(cb => cb.value);
+  }
+
+  let logoBase64 = null;
+  const imgElement = document.getElementById('logoImg');
+  if (imgElement) {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = imgElement.src;
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      logoBase64 = canvas.toDataURL('image/png');
+    };
+  }
+
+  function generarPDFYEnviar() {
+    const cliente = document.getElementById('cliente').value;
+    let telefono = document.getElementById('telefono').value.replace(/\D/g,'');
+    const equipo = document.getElementById('equipo').value;
+
+    if(!cliente || !telefono || !equipo) {
+      alert('Por favor completa al menos Nombre, Teléfono y selecciona un Equipo.');
+      return;
+    }
+
+    // if (telefono.startsWith('0')) {
+    //   telefono = '58' + telefono.substring(1);
+    // }
+
+    const voltaje = document.getElementById('voltaje').value || 'N/A';
+    const amperaje = document.getElementById('amperaje').value || 'N/A';
+    const tipoGas = document.getElementById('tipoGas').value || 'N/A';
+    const presion = document.getElementById('presion').value || 'N/A';
+    const detallePresion = tipoGas !== 'N/A' ? `${presion} (${tipoGas})` : presion;
+
+    const capacitor = getSelectedValues('capDropdown').join(', ') || 'N/A';
+    const sensores = getSelectedValues('sensorDropdown').join(', ') || 'N/A';
+    const termicos = getSelectedValues('termicoDropdown').join(', ') || 'N/A';
+    const tarjeta = getSelectedValues('tarjetaDropdown').join(', ') || 'N/A';
+    const rodCond = getSelectedValues('rodCondDropdown').join(', ') || 'N/A';
+    const rodEvap = getSelectedValues('rodEvapDropdown').join(', ') || 'N/A';
+
+    const diagnostico = document.getElementById('diagnostico').value || 'Revisión general realizada.';
+    const recomSelected = getSelectedValues('recomDropdown');
+    const recomendacion = recomSelected.length > 0 ? recomSelected.join('\n• ') : 'Revisión general realizada.';
+    const monto = document.getElementById('monto').value || 'Consultar';
+
+    // Fecha y hora en tiempo real exacta
+    const hoy = new Date();
+    const fechaStr = hoy.toLocaleDateString('es-VE');
+    const horaStr = hoy.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: 'p',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Banda superior estética
+    doc.setFillColor(2, 132, 199);
+    doc.rect(0, 0, 210, 5, 'F');
+
+    // Logo en PDF
+    if (logoBase64) {
+      try {
+        doc.addImage(logoBase64, 'PNG', 14, 12, 20, 20);
+      } catch (e) {
+        console.log('Error dibujando logo:', e);
+      }
+    }
+
+    // Cabecera del documento PDF
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(3, 105, 161);
+    doc.text("MULTISERVICIOS EDUIN DÍAZ", 38, 18);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text("Refrigeración • Climatización Profesional", 38, 23);
+    doc.text("Garantía y Servicio Técnico Autorizado", 38, 28);
+
+    // Fecha, hora y folio a la derecha
+    doc.setFontSize(8.5);
+    doc.text(`Fecha: ${fechaStr}`, 196, 16, { align: 'right' });
+    doc.text(`Hora: ${horaStr}`, 196, 21, { align: 'right' });
+    doc.text(`Reporte N°: ${Math.floor(1000 + Math.random() * 9000)}`, 196, 26, { align: 'right' });
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.5);
+    doc.line(14, 35, 196, 35);
+
+    // Tabla 1: Cliente
+    doc.autoTable({
+      startY: 40,
+      head: [['DATOS DEL CLIENTE Y EQUIPO', '']],
+      body: [
+        ['Cliente:', cliente],
+        ['Teléfono:', telefono],
+        ['Equipo / Modelo:', equipo]
+      ],
+      theme: 'striped',
+      headStyles: { fillColor: [2, 132, 199], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 9, cellPadding: 2.5 },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } }
+    });
+
+    // Tabla 2: Mediciones
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 6,
+      head: [['PARÁMETRO / COMPONENTE TÉCNICO', 'ESTADO / LECTURA']],
+      body: [
+        ['Voltaje:', voltaje],
+        ['Amperaje:', amperaje],
+        ['Presión de Gas:', detallePresion],
+        ['Capacitor:', capacitor],
+        ['Sensores de Temperatura:', sensores],
+        ['Protección Térmica:', termicos],
+        ['Tarjeta Electrónica:', tarjeta],
+        ['Rodamientos Condensadora:', rodCond],
+        ['Rodamientos Evaporadora:', rodEvap]
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [3, 105, 161], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 8.5, cellPadding: 2 },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 60 } }
+    });
+
+    // Tabla 3: Diagnóstico
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 6,
+      head: [['DIAGNÓSTICO TÉCNICO Y PRESUPUESTO', '']],
+      body: [
+        ['Diagnóstico:', diagnostico],
+        ['Servicio Requerido:', '• ' + recomendacion],
+        ['Presupuesto Estimado:', monto]
+      ],
+      theme: 'plain',
+      headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 9, cellPadding: 3 },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 45 } }
+    });
+
+    // Pie de página del PDF
+    const posY = doc.lastAutoTable.finalY + 12;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text("--------------------------------------------------------------------------------------------------------------------------------------", 105, posY, { align: 'center' });
+    doc.text("Este documento certifica el diagnóstico técnico realizado por Multiservicios Eduin Díaz.", 105, posY + 5, { align: 'center' });
+
+    // Descarga del PDF
+    doc.save(`Reporte_${cliente.replace(/\s+/g, '_')}.pdf`);
+
+    // Mensaje WhatsApp elegante
+    const mensajeWA =
+`Estimado/a *${cliente}*, le saludamos de *Multiservicios Eduin Díaz*. 🛠️
+
+Adjunto encontrará el Reporte Técnico de Diagnóstico detallado para su *${equipo}*.
+
+Por favor, revíselo y nos comenta si desea proceder o si requiere alguna información adicional.
+
+¡Quedamos atentos a su respuesta!`;
+    const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensajeWA)}`;
+    
+    setTimeout(() => {
+      window.open(url, '_blank');
+    }, 400);
+  }
+
+  // PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
+    });
+  }
+</script>
+
+</body>
+</html>
